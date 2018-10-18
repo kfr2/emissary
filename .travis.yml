@@ -1,3 +1,7 @@
+# Don't email me the results of the test runs.
+notifications:
+  email: false
+
 language: go
 
 go:
@@ -6,14 +10,17 @@ go:
   - "1.10"
   - "1.11"
 
-before_install:
-  - go get -u github.com/golang/dep/cmd/dep
-  - dep ensure
+
+# Skip the install step. Don't `go get` dependencies. Only build with the code
+# in vendor/. See https://docs.travis-ci.com/user/languages/go/#godep-support
+install: true
 
 before_script:
   - echo $TRAVIS_GO_VERSION
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $GOPATH/bin v1.10.2
 
 script:
+  - golangci-lint run
   - bash ./scripts/test.sh
 
 after_success:
